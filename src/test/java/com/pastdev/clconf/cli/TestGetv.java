@@ -24,13 +24,13 @@ import picocli.CommandLine.IFactory;
 public class TestGetv {
 	@Autowired
 	private IFactory springFactory;
-	
-	private String getv(String... args) throws UnsupportedEncodingException {
+
+	private String clconf(String... args) throws UnsupportedEncodingException {
 		PrintStream systemDotOut = System.out;
 	    final ByteArrayOutputStream stream = new ByteArrayOutputStream();
 	    try (PrintStream out = new PrintStream(stream, true, "UTF-8")) {
 	    	System.setOut(out);
-		    CommandLine.call(Getv.class, springFactory, out, Help.Ansi.AUTO, args);
+		    CommandLine.call(Clconf.class, springFactory, out, Help.Ansi.AUTO, args);
 	    }
 	    finally {
 	    	System.setOut(systemDotOut);
@@ -44,7 +44,7 @@ public class TestGetv {
 	
 	@Test
 	public void getv() throws IOException {
-		assertYamlEquals("one: 1", getv("--yaml-base64", base64("one: 1")));
-		assertYamlEquals("1", getv("--yaml-base64", base64("one: 1"), "/one"));
+		assertYamlEquals("one: 1", clconf("getv", "--yaml-base64", base64("one: 1")));
+		assertYamlEquals("1", clconf("getv", "--yaml-base64", base64("one: 1"), "/one"));
 	}
 }
