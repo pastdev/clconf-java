@@ -12,16 +12,22 @@ public interface Clconf {
 	 * variable names whose values are base64 encoded yaml strings
 	 */
 	public static final String ENV_YAML_VARS = "YAML_VARS";
+	/** The list separator */
+	public static final String LIST_SEPARATOR = ",";
+	/** The path separator */
+	public static final String PATH_SEPARATOR = "/";
 	/** The pattern used to split ENV_ variable values */
-	public static final Pattern PATTERN_SPLITTER = Pattern.compile(",");
+	public static final Pattern PATTERN_SPLITTER = Pattern.compile(LIST_SEPARATOR);
+	/** The pattern used to split paths */
+	public static final Pattern PATTERN_PATH_SPLITTER = Pattern.compile(PATH_SEPARATOR);
 
-    Map<String, Object> getValue(Map<String, Object> configuration, String path);
+    Object getValue(Map<String, Object> configuration, String path);
     
     Map<String, Object> setValue(Map<String, Object> configuration, String path, String value);
     
     /**
-     *  Loads all configurations present.  In order of precedence (highest last),
-     *  files, overrides.
+     * Loads all configurations present.  In order of precedence (highest last),
+     * files, overrides.
      *  
      * @param files A list of yaml files to merge
      * @param overrides A list of base64 encoded yaml strings
@@ -31,8 +37,8 @@ public interface Clconf {
     Map<String, Object> loadConfiguration(String[] files, String[] overrides) throws IOException;
     
     /**
-     *  Loads all configurations present.  In order of precedence (highest last),
-     *  files, YAML_FILES env var, overrides, YAML_VARS env var.
+     * Loads all configurations present.  In order of precedence (highest last),
+     * files, YAML_FILES env var, overrides, YAML_VARS env var.
      *  
      * @param files A list of yaml files to merge
      * @param overrides A list of base64 encoded yaml strings
@@ -40,6 +46,8 @@ public interface Clconf {
      * @throws IOException if unable to read any of the files
      */
     Map<String, Object> loadConfigurationFromEnvironment(String[] files, String[] overrides) throws IOException;
+
+    String marshalYaml( Object configuration);
     
     Map<String, Object> unmarshalYaml(String... yaml);
 }

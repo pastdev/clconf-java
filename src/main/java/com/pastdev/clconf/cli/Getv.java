@@ -1,34 +1,46 @@
 package com.pastdev.clconf.cli;
 
+import java.io.IOException;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import org.springframework.beans.factory.annotation.Autowired;
 
-import com.pastdev.clconf.ClconfFactory;
-
+import lombok.extern.slf4j.Slf4j;
 import picocli.CommandLine.Command;
 import picocli.CommandLine.Mixin;
 
+@Slf4j
 @Command(name = "getv", description = "Get a value")
 public class Getv implements Callable<Void> {
 	@Autowired
-	private ClconfFactory clconfFactory;
-	
+	private com.pastdev.clconf.Clconf clconf;
+	@Mixin
+	private GlobalOptions globalOptions;
 	@Mixin
 	private GetvParametersAndOptions parametersAndOptions;
 
-	@Mixin
-	private GlobalOptions globalOptions;
+	Object getValue() throws IOException {
+		Map<String, Object> configuration = clconf.loadConfigurationFromEnvironment(globalOptions.getYaml(),
+				globalOptions.getYamlBase64());
+		if (parametersAndOptions.getPath() == null || parametersAndOptions.getPath().isEmpty()) {
+			log.debug("getValue empty path");
+			return configuration;
+		}
+
+		log.debug("getValue for path {}", parametersAndOptions.getPath());
+		Object value = clconf.getValue(configuration, parametersAndOptions.getPath());
+
+		if (value == null) {
+			return parametersAndOptions.getDefaultValue() != null ? parametersAndOptions.getDefaultValue() : value;
+		}
+
+		return value;
+	}
 
 	@Override
 	public Void call() throws Exception {
-		com.pastdev.clconf.Clconf clconf = clconfFactory.NewClconf();
-		Map<String, Object> configuration =
-				clconf.loadConfigurationFromEnvironment(
-						globalOptions.yaml.split(","),
-						globalOptions.yamlBase64.split(","));
-					
+		System.out.println(clconf.marshalYaml(getValue()));
 		return null;
 	}
 }

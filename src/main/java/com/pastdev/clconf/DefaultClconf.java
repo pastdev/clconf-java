@@ -13,6 +13,9 @@ import java.util.stream.Collectors;
 
 import org.yaml.snakeyaml.Yaml;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 public class DefaultClconf implements Clconf {
 	private Map<String, String> environment = System.getenv();
 
@@ -23,9 +26,35 @@ public class DefaultClconf implements Clconf {
 	}
 
 	@Override
-	public Map<String, Object> getValue(Map<String, Object> configuration, String path) {
-		// TODO Auto-generated method stub
-		return null;
+	public Object getValue(Map<String, Object> configuration, String path) {
+		if (path == null || "".equals(path) || PATH_SEPARATOR.equals(path)) {
+			return configuration;
+		}
+		
+		String currentPath = PATH_SEPARATOR;
+		Object value = configuration;
+        for (String part : PATTERN_PATH_SPLITTER.split(path)) {
+        	if ("".equals(part)) {
+        		continue;
+        	}
+
+        	if (!(value instanceof Map)) {
+        	    log.warn("value at {} not a map", currentPath);
+        	    return null;
+        	}
+        	
+        	currentPath = (currentPath == PATH_SEPARATOR ? PATH_SEPARATOR : currentPath + PATH_SEPARATOR ) + part;
+
+        	@SuppressWarnings("unchecked")
+			Map<String, Object> casted = (Map<String, Object>)value;
+			value = casted.get(part);
+        	if (value == null) {
+        	    log.warn("value at {} does not exist", currentPath);
+        		return null;
+        	}
+        }
+
+        return value;
 	}
 
 	@Override
@@ -75,6 +104,11 @@ public class DefaultClconf implements Clconf {
 	
 	public void setEnvironment(Map<String, String> environment) {
 		this.environment = environment;
+	}
+
+	@Override
+	public String marshalYaml(Object value) {
+		return new Yaml().dump(value);
 	}
 
 	@Override

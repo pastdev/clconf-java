@@ -1,67 +1,20 @@
 package com.pastdev.clconf;
 
 import static com.pastdev.clconf.DefaultClconf.deepMerge;
-import static org.junit.Assert.assertArrayEquals;
+import static com.pastdev.clconf.TestUtil.assertDeepEquals;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
-import java.io.Closeable;
 import java.io.IOException;
-import java.nio.file.Files;
-import java.nio.file.Path;
 import java.util.Arrays;
 import java.util.Base64;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.UUID;
 
 import org.junit.Test;
 
 public class TestDefaultClconf {
-	private void assertDeepEquals(Map<String, Object> expected, Map<String, Object> actual) {
-        assertDeepEquals(expected, actual, "");
-	}
-
-	private void assertDeepEquals(Map<String, Object> expected, Map<String, Object> actual, String base) {
-	    assertEquals(base + " key count", expected.size(), actual.size());
-	    
-	    for (String key : expected.keySet()) {
-	    	Object expectedValue = expected.get(key);
-	    	Object actualValue = actual.get(key);
-
-	    	if (expectedValue instanceof Map) {
-	    		if (actualValue instanceof Map) {
-	    			@SuppressWarnings("unchecked")
-					Map<String, Object> castedExpectedValue = (Map<String, Object>)expectedValue;
-	    			@SuppressWarnings("unchecked")
-					Map<String, Object> castedActualValue = (Map<String, Object>)actualValue;
-	    			assertDeepEquals(castedExpectedValue, castedActualValue, base + "/" + key);
-	    		}
-	    		else {
-	    	        fail(base + "/" + key + " expected map, got " + actual.getClass().getName());
-	    		}
-	    	}
-	    	else if (expectedValue instanceof List) {
-	    		if (actualValue instanceof List) {
-	    			@SuppressWarnings("unchecked")
-					List<Object> castedExpectedValue = (List<Object>)expectedValue;
-	    			@SuppressWarnings("unchecked")
-					List<Object> castedActualValue = (List<Object>)actualValue;
-	    			assertArrayEquals(base + "/" + key,
-	    					castedExpectedValue.toArray(),
-	    					castedActualValue.toArray());
-	    		}
-	    		else {
-	    	        fail(base + "/" + key + " expected list, got " + actual.getClass().getName());
-	    		}
-	    	}
-	    	else {
-	    		assertEquals(base + "/" + key, expectedValue, actualValue);
-	    	}
-	    }
-	}
-
 	@Test
 	public void deepMergeBasic() {
 		Map<String, Object> overrides = new HashMap<>();
@@ -112,6 +65,32 @@ public class TestDefaultClconf {
 
 		assertDeepEquals(expected, deepMerge(configuration, overrides));
 	}
+	
+	@SuppressWarnings("unchecked")
+	@Test
+	public void getValue() {
+		Map<String, Object> configuration = new HashMap<>();
+		configuration.put("one", 1);
+        Map<String, Object> sub = new HashMap<>();
+        sub.put("subone", 1);
+        sub.put("subtwo", 2);
+		configuration.put("sub", sub);
+
+        assertEquals(1, new DefaultClconf().getValue(configuration, "one"));
+        assertEquals(null, new DefaultClconf().getValue(configuration, "two"));
+        
+        Object actual = new DefaultClconf().getValue(configuration, null);
+        assertDeepEquals(configuration, (Map<String, Object>)actual);
+        actual = new DefaultClconf().getValue(configuration, "");
+        assertDeepEquals(configuration, (Map<String, Object>)actual);
+        actual = new DefaultClconf().getValue(configuration, "/");
+        assertDeepEquals(configuration, (Map<String, Object>)actual);
+
+        actual = new DefaultClconf().getValue(configuration, "/sub");
+        assertTrue(actual instanceof Map);
+        assertDeepEquals(sub, (Map<String, Object>)actual);
+        assertEquals(1, new DefaultClconf().getValue(configuration, "/sub/subone"));
+	}
 
 	@Test
 	public void loadConfiguration() {
@@ -121,8 +100,8 @@ public class TestDefaultClconf {
 		expected.put("three", 3);
 		expected.put("four", 4);
 
-		try (TempYml one = new TempYml("one: 1");
-		        TempYml two = new TempYml("two: 2")) {
+		try (TempYaml one = new TempYaml("one: 1");
+		        TempYaml two = new TempYaml("two: 2")) {
 		    assertDeepEquals(expected, 
 					new DefaultClconf().loadConfiguration(
 							new String[] {
@@ -145,8 +124,8 @@ public class TestDefaultClconf {
 		expected.put("one", 1);
 		expected.put("two", 2);
 
-		try (TempYml one = new TempYml("one: 1");
-		        TempYml two = new TempYml("two: 2")) {
+		try (TempYaml one = new TempYaml("one: 1");
+		        TempYaml two = new TempYaml("two: 2")) {
 		    assertDeepEquals(expected, 
 					new DefaultClconf().loadConfiguration(
 							new String[] {
@@ -187,10 +166,10 @@ public class TestDefaultClconf {
 		expected.put("seven", 7);
 		expected.put("eight", 8);
 
-		try (TempYml one = new TempYml("one: 1");
-		        TempYml two = new TempYml("two: 2");
-		        TempYml three = new TempYml("three: 3");
-		        TempYml four = new TempYml("four: 4")) {
+		try (TempYaml one = new TempYaml("one: 1");
+		        TempYaml two = new TempYaml("two: 2");
+		        TempYaml three = new TempYaml("three: 3");
+		        TempYaml four = new TempYaml("four: 4")) {
 
 			DefaultClconf clconf = new DefaultClconf();
 			Map<String, String> environment = new HashMap<>();
@@ -280,26 +259,5 @@ public class TestDefaultClconf {
 		expected.put("list", Arrays.asList("one", "two", "three"));
 
 		assertDeepEquals(expected, new DefaultClconf().unmarshalYaml(original));
-	}
-	
-	private class TempYml implements Closeable {
-		private Path path;
-		
-		private TempYml(String content) throws IOException {
-			path = Files.createTempFile(UUID.randomUUID().toString(), ".yml");
-			Files.write(path, content.getBytes());
-		}
-
-		@Override
-		public void close() throws IOException {
-			if (Files.exists(path)) {
-				Files.delete(path);
-			}
-		}
-		
-		@Override
-		public String toString() {
-			return path.toString();
-		}
 	}
 }
