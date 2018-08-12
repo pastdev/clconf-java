@@ -1,9 +1,14 @@
 package com.pastdev.clconf.cli;
 
+import static com.pastdev.clconf.impl.MapUtil.castList;
+import static com.pastdev.clconf.impl.MapUtil.castMap;
+
 import java.io.IOException;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.pastdev.clconf.SecretAgent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import picocli.CommandLine.Command;
@@ -18,6 +23,8 @@ public class Getv implements Callable<Void> {
     private GlobalOptions globalOptions;
     @Mixin
     private GetvParametersAndOptions parametersAndOptions;
+    @Autowired
+    private SecretAgentFactory secretAgentFactory;
 
     Object getValue() throws IOException {
         Map<String, Object> configuration = clconf.loadConfigurationFromEnvironment(
@@ -35,6 +42,24 @@ public class Getv implements Callable<Void> {
             return parametersAndOptions.getDefaultValue() != null
                     ? parametersAndOptions.getDefaultValue()
                     : value;
+        }
+        
+        SecretAgent secretAgent = secretAgentFactory.fromGlobalOptions(clconf, globalOptions);
+        if (parametersAndOptions.getDecrypt().length > 0) {
+            if (value instanceof Map) {
+                secretAgent.decryptPaths(
+                        castMap(value),
+                        parametersAndOptions.getDecrypt());
+            }
+            else if (value instanceof List) {
+                List<Object> list = castList(value);
+                for (int i = 0; i < list.size(); i++) {
+                    list.set(i, secretAgent.decrypt(list.get(i).toString()));
+                }
+            }
+            else {
+                value = secretAgent.decrypt(value.toString());
+            }
         }
 
         return value;

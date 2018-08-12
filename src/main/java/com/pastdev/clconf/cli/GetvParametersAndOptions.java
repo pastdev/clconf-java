@@ -11,9 +11,8 @@ public class GetvParametersAndOptions {
     @Parameters(index = "0", arity = "0..1", description = "yaml path")
     private String path = "";
 
-    @Getter
     @Option(names = "--decrypt", description = "A list of paths whose values needs to be decrypted")
-    private String decript;
+    private String decrypt;
 
     @Getter
     @Option(names = "--default",
@@ -40,4 +39,16 @@ public class GetvParametersAndOptions {
                     + "A string containing a ? template that will be executed "
                     + "against the resulting data.")
     private String templateString;
+
+    /**
+     * Splits the value of <code>--decrypt</code> and returns the list.
+     * 
+     * @return The list of decrypt paths.
+     */
+    public String[] getDecrypt() {
+        if (decrypt == null) {
+            return new String[0];
+        }
+        return com.pastdev.clconf.Clconf.PATTERN_SPLITTER.split(decrypt);
+    }
 }

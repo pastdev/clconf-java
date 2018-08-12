@@ -1,5 +1,6 @@
-package com.pastdev.clconf;
+package com.pastdev.clconf.impl;
 
+import static com.pastdev.clconf.impl.MapUtil.castMap;
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
@@ -14,11 +15,6 @@ public class TestUtil {
     @SuppressWarnings("unchecked")
     private static List<Object> castList(Object object) {
         return (List<Object>) object;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> castMap(Object object) {
-        return (Map<String, Object>) object;
     }
 
     /**

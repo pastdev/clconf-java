@@ -1,4 +1,4 @@
-package com.pastdev.clconf;
+package com.pastdev.clconf.impl;
 
 import java.io.Closeable;
 import java.io.IOException;

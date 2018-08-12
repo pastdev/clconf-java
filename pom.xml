@@ -25,6 +25,7 @@
     <java.version>1.8</java.version>
 
     <checkstyle.version>8.12</checkstyle.version>
+    <jpgpj.version>0.4</jpgpj.version>
     <picocli.version>3.3.0</picocli.version>
 
     <maven-checkstyle-plugin.version>3.0.0</maven-checkstyle-plugin.version>
@@ -46,6 +47,11 @@
       <groupId>org.yaml</groupId>
       <artifactId>snakeyaml</artifactId>
       <scope>compile</scope>
+    </dependency>
+    <dependency>
+      <groupId>org.c02e.jpgpj</groupId>
+      <artifactId>jpgpj</artifactId>
+      <version>${jpgpj.version}</version>
     </dependency>
 
     <dependency>

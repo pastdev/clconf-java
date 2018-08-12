@@ -5,6 +5,10 @@ import java.util.Map;
 import java.util.regex.Pattern;
 
 public interface Clconf {
+    /** Environment variable containing the name of the keyring file. */
+    public static final String ENV_SECRET_KEYRING = "SECRET_KEYRING";
+    /** Environment variable containing a base64 encoded keyring. */
+    public static final String ENV_SECRET_KEYRING_BASE64 = "SECRET_KEYRING_BASE64";
     /** Environment variable containing a comma separated list of file names. */
     public static final String ENV_YAML_FILES = "YAML_FILES";
     /**

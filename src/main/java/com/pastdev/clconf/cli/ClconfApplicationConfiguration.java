@@ -13,7 +13,7 @@ public class ClconfApplicationConfiguration {
 
     @Bean
     public static com.pastdev.clconf.Clconf clconf() {
-        return new com.pastdev.clconf.DefaultClconf();
+        return new com.pastdev.clconf.impl.DefaultClconf();
     }
 
     @Bean

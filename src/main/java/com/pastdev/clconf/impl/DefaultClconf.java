@@ -1,4 +1,6 @@
-package com.pastdev.clconf;
+package com.pastdev.clconf.impl;
+
+import static com.pastdev.clconf.impl.MapUtil.deepMerge;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,6 +13,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
+import com.pastdev.clconf.Clconf;
 import lombok.extern.slf4j.Slf4j;
 import org.yaml.snakeyaml.Yaml;
 
@@ -124,40 +127,5 @@ public class DefaultClconf implements Clconf {
         }
 
         return configuration;
-    }
-
-    @SuppressWarnings("unchecked")
-    private static Map<String, Object> castMap(Object object) {
-        return (Map<String, Object>) object;
-    }
-
-    static Map<String, Object> deepMerge(Map<String, Object> configuration,
-            Map<String, Object> overrides) {
-        if (overrides instanceof Map && configuration instanceof Map) {
-            for (String key : overrides.keySet()) {
-                Object overridesValue = overrides.get(key);
-                if (!configuration.containsKey(key)) {
-                    configuration.put(key, overridesValue);
-                }
-                else {
-                    Object configurationValue = configuration.get(key);
-                    if (overridesValue instanceof Map) {
-                        if (configurationValue instanceof Map) {
-                            configuration.put(key,
-                                    deepMerge(
-                                            castMap(configurationValue),
-                                            castMap(overridesValue)));
-                        }
-                    }
-                    else {
-                        configuration.put(key, overridesValue);
-                    }
-                }
-            }
-
-            return configuration;
-        }
-
-        return overrides;
     }
 }

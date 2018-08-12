@@ -1,6 +1,6 @@
 package com.pastdev.clconf.cli;
 
-import static com.pastdev.clconf.TestUtil.assertYamlEquals;
+import static com.pastdev.clconf.impl.TestUtil.assertYamlEquals;
 
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
