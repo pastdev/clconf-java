@@ -13,7 +13,7 @@ There is more than one way to [configure](https://checkstyle.org/eclipse-cs/#!/c
 
 1) Window -> Preferences
 2) Checkstyle -> New...
-  * Type: _Internal Configuration_
+   * Type: _Internal Configuration_
   * Name: Pastdev Checks
   * Import...: select the pastdev\_checks.xml from the project
   * OK
