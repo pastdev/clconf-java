@@ -14,9 +14,9 @@ There is more than one way to [configure](https://checkstyle.org/eclipse-cs/#!/c
 1) Window -> Preferences
 2) Checkstyle -> New...
    * Type: _Internal Configuration_
-  * Name: Pastdev Checks
-  * Import...: select the pastdev\_checks.xml from the project
-  * OK
+   * Name: Pastdev Checks
+   * Import...: select the pastdev\_checks.xml from the project
+   * OK
 
 
 #### Create Formatter
@@ -28,17 +28,17 @@ This generates a new formatter named _eclipse-cs <projectName>_. You will need t
 
 1) Window -> Preferences
 2) Java -> Code Style -> Formatter
-  * Active Profile: _eclipse-cs <projectName>_, Edit...
-    * Line Wrapping
-      * Never join already wrapped lines: checked
-      * Select Annotations -> Element-value pairs
-        * Line wrapping policy: Wrap where necessary
-  * Apply
-  * OK
+   * Active Profile: _eclipse-cs <projectName>_, Edit...
+     * Line Wrapping
+       * Never join already wrapped lines: checked
+       * Select Annotations -> Element-value pairs
+         * Line wrapping policy: Wrap where necessary
+   * Apply
+   * OK
 3) Apply
 4) Java -> Code Style -> Organize Imports
-  * Remove all items other than `java` and `javax`
-  * Apply
+   * Remove all items other than `java` and `javax`
+   * Apply
 5) Apply and Close
 
 Then, to enable the formatter, right-click your project:
