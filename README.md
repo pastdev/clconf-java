@@ -6,7 +6,7 @@
 Code style is enforced using [checkstyle](https://checkstyle.org/) at build time.  The style is defined in [pastdev_checks.xml](pastdev_checks.xml), and is enforced during the build.  Any violations will fail the build.
 
 ### Eclipse Integration
-To help prevent style violations before they start, you should install the [Eclipse-CS plugin](http://checkstyle.org/eclipse-cs/#!/).  Once installed you will need to import the style configuration, and create a formatter from it.
+To help prevent style violations before they start, you should install the [Eclipse-CS plugin](http://checkstyle.org/eclipse-cs/#!/).  Once installed you will need to [import the style configuration](#import-checkstyle-configuration), and [create a formatter](#create-formatter) from it.
 
 #### Import Checkstyle Configuration
 There is more than one way to [configure](https://checkstyle.org/eclipse-cs/#!/configtypes) the plugin.  Given that this same configuration will likely be used by many projects, it probably makes the most sense to import into an _Internal Configuration_:
@@ -18,6 +18,7 @@ There is more than one way to [configure](https://checkstyle.org/eclipse-cs/#!/c
    * Import...: select the pastdev\_checks.xml from the project
    * OK
 
+Note, that as this is a global configuration, if you have done this for another project, the configuration will already be available to select.
 
 #### Create Formatter
 From package explorer, right-click your project:
