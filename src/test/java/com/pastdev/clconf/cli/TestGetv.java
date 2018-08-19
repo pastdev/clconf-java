@@ -15,6 +15,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.junit4.SpringRunner;
 import picocli.CommandLine;
+import picocli.CommandLine.ExecutionException;
 import picocli.CommandLine.Help;
 import picocli.CommandLine.IFactory;
 
@@ -44,6 +45,11 @@ public class TestGetv {
 
     private String base64(String yaml) throws UnsupportedEncodingException {
         return Base64.getEncoder().encodeToString(yaml.getBytes("utf-8"));
+    }
+    
+    @Test(expected = ExecutionException.class)
+    public void getvInvalidPath() throws UnsupportedEncodingException {
+        clconf("getv", "--yaml-base64", base64("one: 1"), "/two/three");
     }
 
     @Test

@@ -15,6 +15,11 @@ import com.pastdev.clconf.Clconf;
 import org.junit.Test;
 
 public class TestDefaultClconf {
+    @Test(expected = IllegalArgumentException.class)
+    public void getValueFailsForInvalidPath() {
+        new DefaultClconf().getValue(new HashMap<String, Object>(), "/one");
+    }
+
     @SuppressWarnings("unchecked")
     @Test
     public void getValue() {
@@ -26,7 +31,6 @@ public class TestDefaultClconf {
         configuration.put("sub", sub);
 
         assertEquals(1, new DefaultClconf().getValue(configuration, "one"));
-        assertEquals(null, new DefaultClconf().getValue(configuration, "two"));
 
         Object actual = new DefaultClconf().getValue(configuration, null);
         assertDeepEquals(configuration, (Map<String, Object>) actual);

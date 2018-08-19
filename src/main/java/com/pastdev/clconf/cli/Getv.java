@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
+import com.pastdev.clconf.InvalidPathException;
 import com.pastdev.clconf.SecretAgent;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -36,16 +37,19 @@ public class Getv implements Callable<Void> {
         }
 
         log.debug("getValue for path {}", parametersAndOptions.getPath());
-        Object value = clconf.getValue(configuration, parametersAndOptions.getPath());
-
-        if (value == null) {
-            return parametersAndOptions.getDefaultValue() != null
-                    ? parametersAndOptions.getDefaultValue()
-                    : value;
+        Object value;
+        try {
+            value = clconf.getValue(configuration, parametersAndOptions.getPath());
+        }
+        catch (InvalidPathException e) {
+            if (parametersAndOptions.getDefaultValue() == null) {
+                throw e;
+            }
+            value = parametersAndOptions.getDefaultValue();
         }
         
-        SecretAgent secretAgent = secretAgentFactory.fromGlobalOptions(clconf, globalOptions);
         if (parametersAndOptions.getDecrypt().length > 0) {
+            SecretAgent secretAgent = secretAgentFactory.fromGlobalOptions(clconf, globalOptions);
             if (value instanceof Map) {
                 secretAgent.decryptPaths(
                         castMap(value),

@@ -2,6 +2,7 @@ package com.pastdev.clconf.cli;
 
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Lazy;
 import picocli.CommandLine.IFactory;
 
 @Configuration
@@ -14,6 +15,12 @@ public class ClconfApplicationConfiguration {
     @Bean
     public static com.pastdev.clconf.Clconf clconf() {
         return new com.pastdev.clconf.impl.DefaultClconf();
+    }
+
+    @Lazy
+    @Bean
+    public static SecretAgentFactory secretAgentFactory() {
+        return new JpgpjSecretAgentFactory();
     }
 
     @Bean

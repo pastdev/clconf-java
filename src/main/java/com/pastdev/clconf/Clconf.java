@@ -18,12 +18,8 @@ public interface Clconf {
     public static final String ENV_YAML_VARS = "YAML_VARS";
     /** The list separator. */
     public static final String LIST_SEPARATOR = ",";
-    /** The path separator. */
-    public static final String PATH_SEPARATOR = "/";
     /** The pattern used to split ENV_ variable values. */
     public static final Pattern PATTERN_SPLITTER = Pattern.compile(LIST_SEPARATOR);
-    /** The pattern used to split paths. */
-    public static final Pattern PATTERN_PATH_SPLITTER = Pattern.compile(PATH_SEPARATOR);
 
     Object getValue(Map<String, Object> configuration, String path);
 

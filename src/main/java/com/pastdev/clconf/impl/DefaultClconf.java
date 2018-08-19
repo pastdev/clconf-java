@@ -1,6 +1,8 @@
 package com.pastdev.clconf.impl;
 
 import static com.pastdev.clconf.impl.MapUtil.deepMerge;
+import static com.pastdev.clconf.impl.MapUtil.getValueAt;
+import static com.pastdev.clconf.impl.MapUtil.setValueAt;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -29,47 +31,21 @@ public class DefaultClconf implements Clconf {
 
     @Override
     public Object getValue(Map<String, Object> configuration, String path) {
-        if (path == null || "".equals(path) || PATH_SEPARATOR.equals(path)) {
-            return configuration;
-        }
-
-        String currentPath = PATH_SEPARATOR;
-        Object value = configuration;
-        for (String part : PATTERN_PATH_SPLITTER.split(path)) {
-            if ("".equals(part)) {
-                continue;
-            }
-
-            if (!(value instanceof Map)) {
-                log.warn("value at {} not a map", currentPath);
-                return null;
-            }
-
-            currentPath = (currentPath == PATH_SEPARATOR ? PATH_SEPARATOR
-                    : currentPath + PATH_SEPARATOR) + part;
-
-            @SuppressWarnings("unchecked")
-            Map<String, Object> casted = (Map<String, Object>) value;
-            value = casted.get(part);
-            if (value == null) {
-                log.warn("value at {} does not exist", currentPath);
-                return null;
-            }
-        }
-
-        return value;
+        return getValueAt(configuration, path);
     }
 
     @Override
     public Map<String, Object> setValue(Map<String, Object> configuration, String path,
             String value) {
-        // TODO Auto-generated method stub
-        return null;
+        return setValueAt(configuration, path, value);
     }
 
     @Override
     public Map<String, Object> loadConfiguration(String[] files, String[] overrides)
             throws IOException {
+        log.debug("loadConfiguration from {} files and {} overrides",
+                files == null ? 0 : files.length, overrides == null ? 0 : overrides.length);
+
         // streams don't play nice with checked exceptions
         // (https://stackoverflow.com/q/19757300/516433)
         // so lets do it the old fashioned way
