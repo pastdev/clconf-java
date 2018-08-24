@@ -1,9 +1,11 @@
 package com.pastdev.clconf.cli;
 
+
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Lazy;
 import picocli.CommandLine.IFactory;
+
 
 @Configuration
 public class ClconfApplicationConfiguration {

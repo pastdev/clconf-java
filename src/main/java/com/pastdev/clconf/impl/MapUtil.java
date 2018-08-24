@@ -1,26 +1,29 @@
 package com.pastdev.clconf.impl;
 
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+
 import com.pastdev.clconf.InvalidPathException;
 import lombok.extern.slf4j.Slf4j;
+
 
 @Slf4j
 public class MapUtil {
     /** The path separator. */
     public static final String DEFAULT_PATH_SEPARATOR = "/";
 
-    @SuppressWarnings("unchecked")
-    public static List<Object> castList(Object object) {
+    @SuppressWarnings( "unchecked" )
+    public static List<Object> castList( Object object ) {
         return (List<Object>) object;
     }
 
-    @SuppressWarnings("unchecked")
-    public static Map<String, Object> castMap(Object object) {
+    @SuppressWarnings( "unchecked" )
+    public static Map<String, Object> castMap( Object object ) {
         return (Map<String, Object>) object;
     }
 
@@ -35,26 +38,26 @@ public class MapUtil {
      *            The override values.
      * @return A merged map.
      */
-    public static Map<String, Object> deepMerge(Map<String, Object> configuration,
-            Map<String, Object> overrides) {
-        if (overrides instanceof Map && configuration instanceof Map) {
-            for (String key : overrides.keySet()) {
-                Object overridesValue = overrides.get(key);
-                if (!configuration.containsKey(key)) {
-                    configuration.put(key, overridesValue);
+    public static Map<String, Object> deepMerge( Map<String, Object> configuration,
+            Map<String, Object> overrides ) {
+        if ( overrides instanceof Map && configuration instanceof Map ) {
+            for ( String key : overrides.keySet() ) {
+                Object overridesValue = overrides.get( key );
+                if ( !configuration.containsKey( key ) ) {
+                    configuration.put( key, overridesValue );
                 }
                 else {
-                    Object configurationValue = configuration.get(key);
-                    if (overridesValue instanceof Map) {
-                        if (configurationValue instanceof Map) {
-                            configuration.put(key,
+                    Object configurationValue = configuration.get( key );
+                    if ( overridesValue instanceof Map ) {
+                        if ( configurationValue instanceof Map ) {
+                            configuration.put( key,
                                     deepMerge(
-                                            castMap(configurationValue),
-                                            castMap(overridesValue)));
+                                            castMap( configurationValue ),
+                                            castMap( overridesValue ) ) );
                         }
                     }
                     else {
-                        configuration.put(key, overridesValue);
+                        configuration.put( key, overridesValue );
                     }
                 }
             }
@@ -74,9 +77,10 @@ public class MapUtil {
      * @param path
      *            The path to a value
      * @return The value at path from map, or null
+     * @throws InvalidPathException if path is not found in map
      */
-    public static Object getValueAt(Map<String, Object> map, String path) {
-        return getValueAt(map, path, DEFAULT_PATH_SEPARATOR);
+    public static Object getValueAt( Map<String, Object> map, String path ) {
+        return getValueAt( map, path, DEFAULT_PATH_SEPARATOR );
     }
 
     /**
@@ -90,48 +94,49 @@ public class MapUtil {
      * @param pathSeparator
      *            The path segment separator
      * @return The value at path from map, or null
+     * @throws InvalidPathException if path is not found in map
      */
-    public static Object getValueAt(Map<String, Object> map, String path,
-            String pathSeparator) {
-        MapPath mapPath = new MapPath(path, pathSeparator);
-        if (mapPath.empty()) {
+    public static Object getValueAt( Map<String, Object> map, String path,
+            String pathSeparator ) {
+        MapPath mapPath = new MapPath( path, pathSeparator );
+        if ( mapPath.empty() ) {
             return map;
         }
 
-        return getValueAt(map, mapPath.parts(), pathSeparator, false);
+        return getValueAt( map, mapPath.parts(), pathSeparator, false );
     }
 
-    private static Object getValueAt(Map<String, Object> map, String[] parts, String pathSeparator,
-            boolean create) {
+    private static Object getValueAt( Map<String, Object> map, String[] parts, String pathSeparator,
+            boolean create ) {
         List<String> currentPath = new ArrayList<>();
         Object value = map;
-        for (String part : parts) {
-            if (!(value instanceof Map)) {
-                throw new InvalidPathException("not a map", currentPath, pathSeparator);
+        for ( String part : parts ) {
+            if ( !(value instanceof Map) ) {
+                throw new InvalidPathException( "not a map", currentPath, pathSeparator );
             }
-            Map<String, Object> currentMap = castMap(value);
+            Map<String, Object> currentMap = castMap( value );
 
-            currentPath.add(part);
-            
-            if (!currentMap.containsKey(part)) {
-                if (create) {
-                    log.trace("value at {} is null, creating map", currentPath);
-                    currentMap.put(part, new HashMap<String, Object>());
+            currentPath.add( part );
+
+            if ( !currentMap.containsKey( part ) ) {
+                if ( create ) {
+                    log.trace( "value at {} is null, creating map", currentPath );
+                    currentMap.put( part, new HashMap<String, Object>() );
                 }
                 else {
-                    throw new InvalidPathException("undefined", currentPath, pathSeparator);
+                    throw new InvalidPathException( "undefined", currentPath, pathSeparator );
                 }
             }
 
-            value = currentMap.get(part);
+            value = currentMap.get( part );
         }
 
         return value;
     }
 
-    public static Map<String, Object> setValueAt(Map<String, Object> map, String path,
-            Object value) {
-        return setValueAt(map, path, DEFAULT_PATH_SEPARATOR, value);
+    public static Map<String, Object> setValueAt( Map<String, Object> map, String path,
+            Object value ) {
+        return setValueAt( map, path, DEFAULT_PATH_SEPARATOR, value );
     }
 
     /**
@@ -148,19 +153,19 @@ public class MapUtil {
      *            The value
      * @return The original map with the new value.
      */
-    public static Map<String, Object> setValueAt(Map<String, Object> map, String path,
-            String pathSeparator, Object value) {
-        MapPath mapPath = new MapPath(path, pathSeparator);
-        if (mapPath.empty()) {
-            throw new InvalidPathException("cannot set root element", mapPath.parts(),
-                    pathSeparator);
+    public static Map<String, Object> setValueAt( Map<String, Object> map, String path,
+            String pathSeparator, Object value ) {
+        MapPath mapPath = new MapPath( path, pathSeparator );
+        if ( mapPath.empty() ) {
+            throw new InvalidPathException( "cannot set root element", mapPath.parts(),
+                    pathSeparator );
         }
 
-        Object parent = getValueAt(map, mapPath.parentParts(), pathSeparator, true);
-        if (!(parent instanceof Map)) {
-            throw new InvalidPathException("not a map", mapPath.parentParts(), pathSeparator);
+        Object parent = getValueAt( map, mapPath.parentParts(), pathSeparator, true );
+        if ( !(parent instanceof Map) ) {
+            throw new InvalidPathException( "not a map", mapPath.parentParts(), pathSeparator );
         }
-        castMap(parent).put(mapPath.key(), value);
+        castMap( parent ).put( mapPath.key(), value );
 
         return map;
     }
@@ -168,15 +173,15 @@ public class MapUtil {
     static class MapPath {
         private String[] parts;
 
-        MapPath(String path, String pathSeparator) {
-            if (path == null || "".equals(path) || pathSeparator.equals(path)) {
+        MapPath( String path, String pathSeparator ) {
+            if ( path == null || "".equals( path ) || pathSeparator.equals( path ) ) {
                 parts = new String[0];
             }
             else {
                 parts = Arrays
-                        .stream(path.split(pathSeparator))
-                        .filter(part -> part.length() > 0)
-                        .toArray(String[]::new);
+                        .stream( path.split( pathSeparator ) )
+                        .filter( part -> part.length() > 0 )
+                        .toArray( String[]::new );
             }
         }
 
@@ -189,7 +194,7 @@ public class MapUtil {
         }
 
         public String[] parentParts() {
-            return Arrays.copyOfRange(parts, 0, parts.length - 1);
+            return Arrays.copyOfRange( parts, 0, parts.length - 1 );
         }
 
         public String[] parts() {
